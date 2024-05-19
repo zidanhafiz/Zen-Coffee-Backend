@@ -3,6 +3,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import 'dotenv/config';
 
+import productsRoutes from '@/routes/productRoutes';
+
 const app = express();
 
 // Middlewares
@@ -12,10 +14,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Routes
-app.get('/', (req, res) => {
-  res.send({
-    message: 'Hello World',
-  });
-});
+app.use('/api', productsRoutes);
 
 export default app;
