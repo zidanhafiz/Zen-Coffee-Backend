@@ -12,6 +12,8 @@
   "author": "zidan",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^5.14.0",
+    "cloudinary": "^2.2.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
