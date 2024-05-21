@@ -36,3 +36,29 @@ export const getNewVariants = async (
   const newVariants = newNotDB.concat(inDB);
   return newVariants;
 };
+
+export const buildFilter = (name: string, category: string) => {
+  const filter = {};
+
+  if (name !== '') {
+    const newData = {
+      name: {
+        contains: name,
+        mode: 'insensitive',
+      },
+    };
+    Object.assign(filter, newData);
+  }
+
+  if (category && category !== 'all') {
+    const newData = {
+      category: {
+        contains: category,
+        mode: 'insensitive',
+      },
+    };
+    Object.assign(filter, newData);
+  }
+
+  return filter;
+};

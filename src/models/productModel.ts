@@ -1,5 +1,6 @@
 import prisma from '@/db';
 import { Product, productImg, Variant } from '@/types/constum';
+import { buildFilter } from '@/utils/helper';
 
 const createOne = async (product: Product, images: productImg[], variants: Variant[]) => {
   const createVariantsId = variants.map((v) => {
@@ -23,8 +24,35 @@ const createOne = async (product: Product, images: productImg[], variants: Varia
   });
 };
 
-const getAll = async () => {
+const getAll = async (
+  name: string,
+  category: string,
+  orderBy: string,
+  sort: 'asc' | 'desc'
+) => {
+  const filter = buildFilter(name, category);
+
+  if (Object.keys(filter).length === 0) {
+    return await prisma.product.findMany({
+      orderBy: {
+        [orderBy]: sort,
+      },
+      include: {
+        images: true,
+        variants: {
+          select: {
+            variant: true,
+          },
+        },
+      },
+    });
+  }
+
   return await prisma.product.findMany({
+    where: filter,
+    orderBy: {
+      [orderBy]: sort,
+    },
     include: {
       images: true,
       variants: {

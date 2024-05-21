@@ -52,14 +52,25 @@ const createOne = async (req: Request, res: Response) => {
 
 const getAll = async (req: Request, res: Response) => {
   try {
-    const productData = await product.getAll();
+    // Check validation request params
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.status(400).send(result.array());
+
+    const query = matchedData(req);
+
+    const name = query.name ? query.name : '';
+    const category = query.category ? query.category : 'all';
+    const orderBy = query.orderBy ? query.orderBy : 'name';
+    const sort = query.sort ? query.sort : 'asc';
+
+    const productData = await product.getAll(name, category, orderBy, sort);
 
     return res.status(200).send({
       message: 'Success get all products',
       data: productData,
     });
   } catch (error) {
-    return res.sendStatus(400);
+    return res.status(400).send({ message: error });
   }
 };
 

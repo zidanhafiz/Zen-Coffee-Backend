@@ -1,14 +1,17 @@
 import { Router } from 'express';
 import products from '@/controllers/productController';
 import { uploadImages } from '@/utils/multer';
-import { createProductValidator } from '@/middlewares/productValidator';
+import {
+  createProductValidator,
+  productQueryValidator,
+} from '@/middlewares/productValidator';
 import { idParamsValidator } from '@/middlewares/paramsValidator';
 
 const router = Router();
 
 router
   .route('/')
-  .get(products.getAll)
+  .get(productQueryValidator, products.getAll)
   .post(uploadImages, createProductValidator, products.createOne);
 
 router
