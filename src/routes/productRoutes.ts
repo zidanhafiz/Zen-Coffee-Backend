@@ -15,6 +15,7 @@ router
   .route('/:id')
   .all(idParamsValidator)
   .get(products.getOneById)
-  .delete(products.deleteOneById);
+  .delete(products.deleteOneById)
+  .patch(uploadImages, createProductValidator, products.updateOneById);
 
 export default router;

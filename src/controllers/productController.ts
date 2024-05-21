@@ -85,6 +85,49 @@ const getOneById = async (req: Request, res: Response) => {
   }
 };
 
+const updateOneById = async (req: Request, res: Response) => {
+  try {
+    // Check validation request params
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.status(400).send(result.array());
+
+    const body = matchedData(req);
+    const { id, name, description, category, variants, stock, price } = body;
+
+    let imgUrl;
+
+    if (req.files) {
+      // Upload to Cloudinary and get img url
+      const images = req.files as Array<Express.Multer.File>;
+      imgUrl = await Promise.all(
+        images.map(async (img) => {
+          const base64EncodedImage = Buffer.from(img.buffer).toString('base64');
+          const dataUri = `data:${img.mimetype};base64,${base64EncodedImage}`;
+
+          // Use the cloudinary uploader to upload the image
+          const response = await cld.uploader.upload(dataUri, { folder: 'products' });
+          return { id: response.public_id, url: response.secure_url };
+        })
+      );
+    }
+
+    // Handle product variants
+    const dbVariants = await variant.getAll();
+    const newVariants = await getNewVariants(variants, dbVariants);
+
+    const productData: Product = { id, name, description, category, stock, price };
+    await product.updateOneById(productData, newVariants, imgUrl);
+
+    return res.status(201).send({
+      message: 'Success updated product!',
+    });
+  } catch (error) {
+    return res.status(400).send({
+      message: error,
+    });
+  }
+};
+
 const deleteOneById = async (req: Request, res: Response) => {
   try {
     // Check validation request params
@@ -121,4 +164,4 @@ const deleteOneById = async (req: Request, res: Response) => {
   }
 };
 
-export default { getAll, getOneById, createOne, deleteOneById };
+export default { getAll, getOneById, createOne, deleteOneById, updateOneById };

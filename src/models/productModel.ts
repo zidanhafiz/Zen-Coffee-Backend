@@ -52,6 +52,55 @@ const getById = async (id: string) => {
   });
 };
 
+const updateOneById = async (
+  product: Product,
+  variants: Variant[],
+  images?: productImg[]
+) => {
+  const createVariantsId = variants.map((v) => {
+    return {
+      variantId: v.id,
+    };
+  });
+
+  if (images) {
+    return await prisma.product.update({
+      where: {
+        id: product.id,
+      },
+      data: {
+        ...product,
+        variants: {
+          deleteMany: {
+            productId: product.id,
+          },
+          create: createVariantsId,
+        },
+        images: {
+          createMany: {
+            data: images,
+          },
+        },
+      },
+    });
+  }
+
+  return await prisma.product.update({
+    where: {
+      id: product.id,
+    },
+    data: {
+      ...product,
+      variants: {
+        deleteMany: {
+          productId: product.id,
+        },
+        create: createVariantsId,
+      },
+    },
+  });
+};
+
 const deleteOneById = async (id: string) => {
   return await prisma.product.delete({
     where: {
@@ -60,4 +109,4 @@ const deleteOneById = async (id: string) => {
   });
 };
 
-export default { getAll, getById, createOne, deleteOneById };
+export default { getAll, getById, createOne, deleteOneById, updateOneById };

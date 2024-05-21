@@ -1,4 +1,4 @@
-import { body, param } from 'express-validator';
+import { body } from 'express-validator';
 
 export const createProductValidator = [
   body('name', 'Invalid does not Empty').notEmpty().isLength({ min: 3, max: 100 }),
@@ -8,4 +8,3 @@ export const createProductValidator = [
   body('category', 'Invalid does not Empty').notEmpty(),
   body('variants', 'Invalid does not Empty').notEmpty().isArray({ min: 1 }),
 ];
-
