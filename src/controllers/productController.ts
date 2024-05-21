@@ -43,7 +43,7 @@ const createOne = async (req: Request, res: Response) => {
     const newVariants = await getNewVariants(variants, dbVariants);
 
     const productData: Product = { name, description, category, stock, price };
-    const data = await product.createOne(productData, imgUrl, newVariants);
+    await product.createOne(productData, imgUrl, newVariants);
 
     return res.status(201).send({
       message: 'Success create new product!',

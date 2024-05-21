@@ -14,7 +14,7 @@ export const getNewVariants = async (
     // Loop the db variants
     for (let i = 0; i < dbVariants.length; i++) {
       // If current variant is already exist in DB then push into variable container (inDB)
-      if (dbVariants[i].name === cv) {
+      if (dbVariants[i].name.toLowerCase() === cv.toLowerCase()) {
         inDB.push(dbVariants[i]);
         break;
       }
