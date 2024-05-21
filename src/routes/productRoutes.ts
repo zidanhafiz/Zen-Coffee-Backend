@@ -11,6 +11,10 @@ router
   .get(products.getAll)
   .post(uploadImages, createProductValidator, products.createOne);
 
-router.route('/:id').delete(idParamsValidator, products.deleteOneById);
+router
+  .route('/:id')
+  .all(idParamsValidator)
+  .get(products.getOneById)
+  .delete(products.deleteOneById);
 
 export default router;

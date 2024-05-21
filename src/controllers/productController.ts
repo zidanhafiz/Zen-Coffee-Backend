@@ -6,11 +6,6 @@ import cld from '@/utils/cloudinary';
 import { Product } from '@/types/constum';
 import { getNewVariants } from '@/utils/helper';
 
-const getAll = async (req: Request, res: Response) => {
-  const data = await product.getAll();
-  return res.send(data);
-};
-
 const createOne = async (req: Request, res: Response) => {
   try {
     // Check validation request body
@@ -55,6 +50,41 @@ const createOne = async (req: Request, res: Response) => {
   }
 };
 
+const getAll = async (req: Request, res: Response) => {
+  try {
+    const productData = await product.getAll();
+
+    return res.status(200).send({
+      message: 'Success get all products',
+      data: productData,
+    });
+  } catch (error) {
+    return res.sendStatus(400);
+  }
+};
+
+const getOneById = async (req: Request, res: Response) => {
+  try {
+    // Check validation request params
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.status(400).send(result.array());
+
+    const params = matchedData(req);
+    const id = params.id;
+
+    const productData = await product.getById(id);
+
+    if (!productData) return res.sendStatus(404);
+
+    return res.status(200).send({
+      message: 'Success get product',
+      data: productData,
+    });
+  } catch (error) {
+    return res.sendStatus(400);
+  }
+};
+
 const deleteOneById = async (req: Request, res: Response) => {
   try {
     // Check validation request params
@@ -91,4 +121,4 @@ const deleteOneById = async (req: Request, res: Response) => {
   }
 };
 
-export default { getAll, createOne, deleteOneById };
+export default { getAll, getOneById, createOne, deleteOneById };
