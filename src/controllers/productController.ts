@@ -55,4 +55,40 @@ const createOne = async (req: Request, res: Response) => {
   }
 };
 
-export default { getAll, createOne };
+const deleteOneById = async (req: Request, res: Response) => {
+  try {
+    // Check validation request params
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.status(400).send(result.array());
+
+    const params = matchedData(req);
+    const id = params.id;
+
+    const productData = await product.getById(id);
+
+    if (!productData) return res.sendStatus(404);
+
+    // Delete product image first
+    if (productData.images) {
+      const productImages = productData.images;
+      await Promise.all(
+        productImages.map(async (img) => {
+          return await cld.uploader.destroy(img.id);
+        })
+      );
+    }
+
+    // Delete product
+    await product.deleteOneById(id);
+
+    return res.status(200).send({
+      message: 'Success delete the product!',
+    });
+  } catch (error) {
+    return res.status(400).send({
+      message: error,
+    });
+  }
+};
+
+export default { getAll, createOne, deleteOneById };

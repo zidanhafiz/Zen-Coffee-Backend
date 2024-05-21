@@ -1,19 +1,6 @@
 import prisma from '@/db';
 import { Product, productImg, Variant } from '@/types/constum';
 
-const getAll = async () => {
-  return await prisma.product.findMany({
-    include: {
-      images: true,
-      variants: {
-        select: {
-          variant: true,
-        },
-      },
-    },
-  });
-};
-
 const createOne = async (product: Product, images: productImg[], variants: Variant[]) => {
   const createVariantsId = variants.map((v) => {
     return {
@@ -36,4 +23,41 @@ const createOne = async (product: Product, images: productImg[], variants: Varia
   });
 };
 
-export default { getAll, createOne };
+const getAll = async () => {
+  return await prisma.product.findMany({
+    include: {
+      images: true,
+      variants: {
+        select: {
+          variant: true,
+        },
+      },
+    },
+  });
+};
+
+const getById = async (id: string) => {
+  return await prisma.product.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      images: true,
+      variants: {
+        select: {
+          variant: true,
+        },
+      },
+    },
+  });
+};
+
+const deleteOneById = async (id: string) => {
+  return await prisma.product.delete({
+    where: {
+      id,
+    },
+  });
+};
+
+export default { getAll, getById, createOne, deleteOneById };
