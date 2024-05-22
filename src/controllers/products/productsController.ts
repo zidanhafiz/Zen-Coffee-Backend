@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
-import products from '@/models/productsModel';
-import variants from '@/models/variantsModel';
+import productsModel from '@/models/products/productsModel';
+import imagesModel from '@/models/products/imagesModel';
+import variantsModel from '@/models/variantsModel';
 import { matchedData, validationResult } from 'express-validator';
 import cld from '@/utils/cloudinary';
-import { Product } from '@/types/constum';
+import { Product, productImg } from '@/types/constum';
 import { getNewVariants } from '@/utils/helper';
 
 const createOne = async (req: Request, res: Response) => {
@@ -16,7 +17,7 @@ const createOne = async (req: Request, res: Response) => {
     const { name, description, category, variants, stock, price } = body;
 
     // Handle image product
-    if (!req.files)
+    if (req.files?.length === 0)
       return res.status(400).send({ message: `Product's image is required!` });
 
     const images = req.files as Array<Express.Multer.File>;
@@ -34,11 +35,11 @@ const createOne = async (req: Request, res: Response) => {
     );
 
     // Handle product variants
-    const dbVariants = await variants.getAll();
+    const dbVariants = await variantsModel.getAll();
     const newVariants = await getNewVariants(variants, dbVariants);
 
     const productData: Product = { name, description, category, stock, price };
-    await products.createOne(productData, imgUrl, newVariants);
+    await productsModel.createOne(productData, imgUrl, newVariants);
 
     return res.status(201).send({
       message: 'Success create new product!',
@@ -63,7 +64,7 @@ const getAll = async (req: Request, res: Response) => {
     const orderBy = query.orderBy ? query.orderBy : 'name';
     const sort = query.sort ? query.sort : 'asc';
 
-    const productData = await products.getAll(name, category, orderBy, sort);
+    const productData = await productsModel.getAll(name, category, orderBy, sort);
 
     return res.status(200).send({
       message: 'Success get all products',
@@ -83,7 +84,7 @@ const getOneById = async (req: Request, res: Response) => {
     const params = matchedData(req);
     const id = params.id;
 
-    const productData = await products.getById(id);
+    const productData = await productsModel.getById(id);
 
     if (!productData) return res.sendStatus(404);
 
@@ -103,14 +104,53 @@ const updateOneById = async (req: Request, res: Response) => {
     if (!result.isEmpty()) return res.status(400).send(result.array());
 
     const body = matchedData(req);
-    const { id, name, description, category, variants, stock, price } = body;
+    const { id, name, description, category, variants, stock, price, imagesUrl } = body;
 
-    let imgUrl;
+    // Handle product variants
+    const dbVariants = await variantsModel.getAll();
+    const newVariants = await getNewVariants(variants, dbVariants);
 
-    if (req.files) {
+    const productData: Product = { id, name, description, category, stock, price };
+
+    // Delete unused product's image first
+    const dbImages = await imagesModel.getAll(id);
+    const dbImageIds = dbImages.map((img) => img.id);
+
+    if (imagesUrl) {
+      // Check if images url is exist on DB or not
+      for (const img of imagesUrl) {
+        // If doesn't exist throw error for prevent unknown image source
+        if (!dbImageIds.includes(img)) {
+          return res.sendStatus(404);
+        }
+      }
+
+      // Delete all images that unused on cloudinary and DB
+      await Promise.all(
+        dbImageIds.map(async (id) => {
+          if (!imagesUrl.includes(id)) {
+            await cld.uploader.destroy(id);
+            await imagesModel.deleteOneById(id);
+          }
+        })
+      );
+    } else {
+      // If imagesUrl is empty delete all images on cloudinary and DB
+      await Promise.all(
+        dbImageIds.map(async (id) => {
+          await cld.uploader.destroy(id);
+          await imagesModel.deleteOneById(id);
+        })
+      );
+    }
+
+    // If there are new product's image
+    let newImagesUrl: productImg[] = [];
+
+    if (req.files?.length !== 0) {
       // Upload to Cloudinary and get img url
       const images = req.files as Array<Express.Multer.File>;
-      imgUrl = await Promise.all(
+      newImagesUrl = await Promise.all(
         images.map(async (img) => {
           const base64EncodedImage = Buffer.from(img.buffer).toString('base64');
           const dataUri = `data:${img.mimetype};base64,${base64EncodedImage}`;
@@ -122,14 +162,10 @@ const updateOneById = async (req: Request, res: Response) => {
       );
     }
 
-    // Handle product variants
-    const dbVariants = await variants.getAll();
-    const newVariants = await getNewVariants(variants, dbVariants);
+    // Then upload new product's data and image's url to product DB
+    await productsModel.updateOneById(productData, newVariants, newImagesUrl);
 
-    const productData: Product = { id, name, description, category, stock, price };
-    await products.updateOneById(productData, newVariants, imgUrl);
-
-    return res.status(201).send({
+    return res.status(200).send({
       message: 'Success updated product!',
     });
   } catch (error) {
@@ -148,7 +184,7 @@ const deleteOneById = async (req: Request, res: Response) => {
     const params = matchedData(req);
     const id = params.id;
 
-    const productData = await products.getById(id);
+    const productData = await productsModel.getById(id);
 
     if (!productData) return res.sendStatus(404);
 
@@ -163,7 +199,7 @@ const deleteOneById = async (req: Request, res: Response) => {
     }
 
     // Delete product
-    await products.deleteOneById(id);
+    await productsModel.deleteOneById(id);
 
     return res.status(200).send({
       message: 'Success delete the product!',

@@ -4,7 +4,8 @@ import { uploadImages } from '@/utils/multer';
 import {
   createProductsValidator,
   productsQueryValidator,
-} from '@/middlewares/productsValidator';
+  updateProductsValidator,
+} from '@/middlewares/products/productsValidator';
 import { idParamsValidator } from '@/middlewares/paramsValidator';
 
 const router = Router();
@@ -19,6 +20,6 @@ router
   .all(idParamsValidator)
   .get(products.getOneById)
   .delete(products.deleteOneById)
-  .patch(uploadImages, createProductsValidator, products.updateOneById);
+  .patch(uploadImages, updateProductsValidator, products.updateOneById);
 
 export default router;

@@ -9,6 +9,10 @@ export const createProductsValidator = [
   body('variants', 'Invalid does not Empty').notEmpty().isArray({ min: 1 }),
 ];
 
+export const updateProductsValidator = createProductsValidator.concat([
+  body('imagesUrl').isArray().optional(),
+]);
+
 export const productsQueryValidator = [
   query('name').escape().trim(),
   query('category').escape().trim(),

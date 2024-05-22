@@ -4,7 +4,8 @@ import cookieParser from 'cookie-parser';
 import 'dotenv/config';
 import helmet from 'helmet';
 
-import productsRoute from '@/routes/productsRoute';
+import productsRoute from '@/routes/api/products/productsRoute';
+import productImagesRoute from '@/routes/api/products/imagesRoute';
 
 const app = express();
 
@@ -17,5 +18,6 @@ app.use(express.json());
 
 // Routes
 app.use('/api/products', productsRoute);
+app.use('/api/products', productImagesRoute);
 
 export default app;

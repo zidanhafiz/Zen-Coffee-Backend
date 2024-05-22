@@ -10,6 +10,7 @@ export type Product = {
 export type productImg = {
   id?: string;
   url: string;
+  productId?: string;
 };
 
 export type Variant = {

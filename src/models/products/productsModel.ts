@@ -83,7 +83,7 @@ const getById = async (id: string) => {
 const updateOneById = async (
   product: Product,
   variants: Variant[],
-  images?: productImg[]
+  images: productImg[]
 ) => {
   const createVariantsId = variants.map((v) => {
     return {
@@ -91,7 +91,7 @@ const updateOneById = async (
     };
   });
 
-  if (images) {
+  if (images.length !== 0) {
     return await prisma.product.update({
       where: {
         id: product.id,

@@ -58,7 +58,7 @@ model ProductImage {
   id        String  @id @default(uuid())
   url       String
   productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model ProductComment {
