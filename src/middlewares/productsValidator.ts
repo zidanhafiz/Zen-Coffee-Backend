@@ -1,6 +1,6 @@
 import { body, query } from 'express-validator';
 
-export const createProductValidator = [
+export const createProductsValidator = [
   body('name', 'Invalid does not Empty').notEmpty().isLength({ min: 3, max: 100 }),
   body('description', 'Invalid does not Empty').notEmpty().isLength({ min: 3 }),
   body('stock', 'Invalid does not Empty').notEmpty().isNumeric().default(1).toInt(),
@@ -9,7 +9,7 @@ export const createProductValidator = [
   body('variants', 'Invalid does not Empty').notEmpty().isArray({ min: 1 }),
 ];
 
-export const productQueryValidator = [
+export const productsQueryValidator = [
   query('name').escape().trim(),
   query('category').escape().trim(),
   query('orderBy').escape().trim(),

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import product from '@/models/productModel';
-import variant from '@/models/variantsModel';
+import products from '@/models/productsModel';
+import variants from '@/models/variantsModel';
 import { matchedData, validationResult } from 'express-validator';
 import cld from '@/utils/cloudinary';
 import { Product } from '@/types/constum';
@@ -34,11 +34,11 @@ const createOne = async (req: Request, res: Response) => {
     );
 
     // Handle product variants
-    const dbVariants = await variant.getAll();
+    const dbVariants = await variants.getAll();
     const newVariants = await getNewVariants(variants, dbVariants);
 
     const productData: Product = { name, description, category, stock, price };
-    await product.createOne(productData, imgUrl, newVariants);
+    await products.createOne(productData, imgUrl, newVariants);
 
     return res.status(201).send({
       message: 'Success create new product!',
@@ -63,7 +63,7 @@ const getAll = async (req: Request, res: Response) => {
     const orderBy = query.orderBy ? query.orderBy : 'name';
     const sort = query.sort ? query.sort : 'asc';
 
-    const productData = await product.getAll(name, category, orderBy, sort);
+    const productData = await products.getAll(name, category, orderBy, sort);
 
     return res.status(200).send({
       message: 'Success get all products',
@@ -83,7 +83,7 @@ const getOneById = async (req: Request, res: Response) => {
     const params = matchedData(req);
     const id = params.id;
 
-    const productData = await product.getById(id);
+    const productData = await products.getById(id);
 
     if (!productData) return res.sendStatus(404);
 
@@ -123,11 +123,11 @@ const updateOneById = async (req: Request, res: Response) => {
     }
 
     // Handle product variants
-    const dbVariants = await variant.getAll();
+    const dbVariants = await variants.getAll();
     const newVariants = await getNewVariants(variants, dbVariants);
 
     const productData: Product = { id, name, description, category, stock, price };
-    await product.updateOneById(productData, newVariants, imgUrl);
+    await products.updateOneById(productData, newVariants, imgUrl);
 
     return res.status(201).send({
       message: 'Success updated product!',
@@ -148,7 +148,7 @@ const deleteOneById = async (req: Request, res: Response) => {
     const params = matchedData(req);
     const id = params.id;
 
-    const productData = await product.getById(id);
+    const productData = await products.getById(id);
 
     if (!productData) return res.sendStatus(404);
 
@@ -163,7 +163,7 @@ const deleteOneById = async (req: Request, res: Response) => {
     }
 
     // Delete product
-    await product.deleteOneById(id);
+    await products.deleteOneById(id);
 
     return res.status(200).send({
       message: 'Success delete the product!',
