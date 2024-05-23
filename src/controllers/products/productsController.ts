@@ -106,6 +106,9 @@ const updateOneById = async (req: Request, res: Response) => {
     const body = matchedData(req);
     const { id, name, description, category, variants, stock, price, imagesUrl } = body;
 
+    const isProductExist = await productsModel.getById(id);
+    if (!isProductExist) return res.sendStatus(404);
+
     // Handle product variants
     const dbVariants = await variantsModel.getAll();
     const newVariants = await getNewVariants(variants, dbVariants);
