@@ -94,7 +94,7 @@ model Bank {
   id      String @id @default(uuid())
   name    String @db.VarChar(255)
   bank    String @db.VarChar(100)
-  account Int
+  account String @db.Text
   userId  String
   user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

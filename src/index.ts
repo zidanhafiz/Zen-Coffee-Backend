@@ -5,6 +5,7 @@ import 'dotenv/config';
 import helmet from 'helmet';
 
 import usersRoute from '@/routes/api/users/usersRoute';
+import banksRoute from '@/routes/api/users/banksRoute';
 import productsRoute from '@/routes/api/products/productsRoute';
 import productImagesRoute from '@/routes/api/products/imagesRoute';
 
@@ -18,11 +19,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Routes
-// Products Routes
+// Products routes
 app.use('/api/products', productsRoute);
 app.use('/api/products', productImagesRoute);
 
-// Users Routes
+// Users routes
 app.use('/api/users', usersRoute);
+
+// User's bank routes
+app.use('/api/banks', banksRoute);
 
 export default app;

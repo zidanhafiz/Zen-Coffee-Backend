@@ -30,3 +30,10 @@ export type UserUpdate = {
   fullName?: string;
   email?: string;
 };
+
+export type Bank = {
+  bank: string;
+  name: string;
+  account: string;
+  userId: string;
+};
