@@ -5,7 +5,7 @@ import { matchedData, validationResult } from 'express-validator';
 const getAll = async (req: Request, res: Response) => {
   try {
     const result = validationResult(req);
-    if (!result.isEmpty) return res.status(400).send(result.array());
+    if (!result.isEmpty()) return res.status(400).send(result.array());
 
     const params = matchedData(req);
 

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import products from '@/controllers/products/productsController';
+import productsController from '@/controllers/products/productsController';
 import { uploadImages } from '@/utils/multer';
 import {
   createProductsValidator,
@@ -12,14 +12,14 @@ const router = Router();
 
 router
   .route('/')
-  .get(productsQueryValidator, products.getAll)
-  .post(uploadImages, createProductsValidator, products.createOne);
+  .get(productsQueryValidator, productsController.getAll)
+  .post(uploadImages, createProductsValidator, productsController.createOne);
 
 router
   .route('/:id')
   .all(idParamsValidator)
-  .get(products.getOneById)
-  .delete(products.deleteOneById)
-  .patch(uploadImages, updateProductsValidator, products.updateOneById);
+  .get(productsController.getOneById)
+  .delete(productsController.deleteOneById)
+  .patch(uploadImages, updateProductsValidator, productsController.updateOneById);
 
 export default router;

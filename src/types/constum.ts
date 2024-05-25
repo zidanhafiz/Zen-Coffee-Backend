@@ -17,3 +17,16 @@ export type Variant = {
   id: string;
   name: string;
 };
+
+export type User = {
+  id: string;
+  username: string;
+  fullName: string;
+  email: string;
+  role?: 'ADMIN' | 'USER';
+};
+
+export type UserUpdate = {
+  fullName?: string;
+  email?: string;
+};
